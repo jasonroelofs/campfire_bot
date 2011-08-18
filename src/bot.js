@@ -9,6 +9,12 @@
   });
   runner.join(429966, function(error, room) {
     console.log("Joined room ", room);
+    process.on("SIGINT", function() {
+      return room.leave(function() {
+        console.log("Leaving the room!");
+        return process.exit();
+      });
+    });
     return room.listen(function(message) {
       console.log("Got message ", message);
       if (message.type === "TextMessage") {

@@ -7,6 +7,11 @@ runner = new Campfire { ssl: true, token: "b36e890502f03151a05c0f08babcdfbd33d2f
 runner.join 429966, (error, room) ->
   console.log "Joined room ", room
 
+  process.on "SIGINT", ->
+    room.leave ->
+      console.log "Leaving the room!"
+      process.exit()
+
   room.listen (message) ->
     console.log "Got message ", message
     if message.type == "TextMessage"
@@ -14,4 +19,5 @@ runner.join 429966, (error, room) ->
         room.speak "Yes?"
       if message.body.match /PING/i
         room.speak "PONG"
+
 
