@@ -1,8 +1,12 @@
+###
+   An HTTP frontend for sending messages to the bot outside of Campfire
+###
 http = require("http")
 
 class HttpFrontend
-  constructor: ->
-    @server = http.createServer this.handleRequest
+  constructor: (@chat) ->
+    @server = http.createServer (request, response) =>
+      this.handleRequest request, response
 
   run: ->
     console.log "HTTP Server now listening on localhost:8080"
@@ -15,6 +19,7 @@ class HttpFrontend
 
   handleRequest: (request, response) ->
     console.log "Got request ", request
+    @chat.speak "I gots an HTTP message from someone!"
     response.writeHead 200, {"Content-type", "text/plain"}
     response.end()
 
