@@ -1,12 +1,9 @@
 (function() {
   var HttpFrontend, http;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   http = require("http");
   HttpFrontend = (function() {
     function HttpFrontend() {
-      this.server = http.createServer(__bind(function(request, response) {
-        return this.handleRequest(request, response);
-      }, this));
+      this.server = http.createServer(this.handleRequest);
     }
     HttpFrontend.prototype.run = function() {
       console.log("HTTP Server now listening on localhost:8080");
@@ -17,7 +14,14 @@
       this.server.close();
       return callback();
     };
-    HttpFrontend.prototype.handleRequest = function(request, response) {};
+    HttpFrontend.prototype.handleRequest = function(request, response) {
+      console.log("Got request ", request);
+      response.writeHead(200, {
+        "Content-type": "Content-type",
+        "text/plain": "text/plain"
+      });
+      return response.end();
+    };
     return HttpFrontend;
   })();
   module.exports = HttpFrontend;

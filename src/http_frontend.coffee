@@ -2,8 +2,7 @@ http = require("http")
 
 class HttpFrontend
   constructor: ->
-    @server = http.createServer (request, response) =>
-      this.handleRequest request, response
+    @server = http.createServer this.handleRequest
 
   run: ->
     console.log "HTTP Server now listening on localhost:8080"
@@ -15,6 +14,9 @@ class HttpFrontend
     callback()
 
   handleRequest: (request, response) ->
+    console.log "Got request ", request
+    response.writeHead 200, {"Content-type", "text/plain"}
+    response.end()
 
 
 module.exports = HttpFrontend
