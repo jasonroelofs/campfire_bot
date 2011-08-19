@@ -4,7 +4,7 @@ HttpFrontend = require("./http_frontend")
 class Bot
   constructor: ->
     @chat = new Chat()
-    @http = new HttpFrontend()
+    @http = new HttpFrontend(@chat)
 
   run: ->
     @chat.run()

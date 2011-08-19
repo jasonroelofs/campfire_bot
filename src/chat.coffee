@@ -10,14 +10,18 @@ class Chat
   run: ->
     @runner.join 429966, (error, room) =>
       @room = room
+      @room.listen this.handleMessage
 
-      @room.listen (message) ->
-        console.log "Got message ", message
-        if message.type == "TextMessage"
-          if message.body.match /gir/i
-            @room.speak "Yes?"
-          if message.body.match /PING/i
-            @room.speak "PONG"
+  handleMessage: (message) ->
+    console.log "Got message ", message
+    if message.type == "TextMessage"
+      if message.body.match /gir/i
+        @room.speak "Yes?"
+      if message.body.match /PING/i
+        @room.speak "PONG"
+
+  speak: (message) ->
+    @room.speak message
 
   shutdown: (callback) ->
     @room.leave ->

@@ -6,7 +6,7 @@
   Bot = (function() {
     function Bot() {
       this.chat = new Chat();
-      this.http = new HttpFrontend();
+      this.http = new HttpFrontend(this.chat);
     }
     Bot.prototype.run = function() {
       this.chat.run();
