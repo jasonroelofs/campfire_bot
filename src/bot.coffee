@@ -1,23 +1,21 @@
-Campfire = require("../vendor/node-campfire/lib/campfire").Campfire
+Chat = require("./chat")
+HttpFrontend = require("./http_frontend")
 
-console.log "Got campfire: ", Campfire
+class Bot
+  constructor: ->
+    @chat = new Chat()
+    @http = new HttpFrontend()
 
-runner = new Campfire { ssl: true, token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2", account: "maestroelearning"}
+  run: ->
+    @chat.run()
+    @http.run()
 
-runner.join 429966, (error, room) ->
-  console.log "Joined room ", room
-
-  process.on "SIGINT", ->
-    room.leave ->
-      console.log "Leaving the room!"
-      process.exit()
-
-  room.listen (message) ->
-    console.log "Got message ", message
-    if message.type == "TextMessage"
-      if message.body.match /gir/i
-        room.speak "Yes?"
-      if message.body.match /PING/i
-        room.speak "PONG"
+    process.on "SIGINT", =>
+      console.log "Bot shutting down now!"
+      @http.shutdown =>
+        @chat.shutdown =>
+          process.exit()
 
 
+bot = new Bot()
+bot.run()

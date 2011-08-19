@@ -1,30 +1,27 @@
 (function() {
-  var Campfire, runner;
-  Campfire = require("../vendor/node-campfire/lib/campfire").Campfire;
-  console.log("Got campfire: ", Campfire);
-  runner = new Campfire({
-    ssl: true,
-    token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2",
-    account: "maestroelearning"
-  });
-  runner.join(429966, function(error, room) {
-    console.log("Joined room ", room);
-    process.on("SIGINT", function() {
-      return room.leave(function() {
-        console.log("Leaving the room!");
-        return process.exit();
-      });
-    });
-    return room.listen(function(message) {
-      console.log("Got message ", message);
-      if (message.type === "TextMessage") {
-        if (message.body.match(/gir/i)) {
-          room.speak("Yes?");
-        }
-        if (message.body.match(/PING/i)) {
-          return room.speak("PONG");
-        }
-      }
-    });
-  });
+  var Bot, Chat, HttpFrontend, bot;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  Chat = require("./chat");
+  HttpFrontend = require("./http_frontend");
+  Bot = (function() {
+    function Bot() {
+      this.chat = new Chat();
+      this.http = new HttpFrontend();
+    }
+    Bot.prototype.run = function() {
+      this.chat.run();
+      this.http.run();
+      return process.on("SIGINT", __bind(function() {
+        console.log("Bot shutting down now!");
+        return this.http.shutdown(__bind(function() {
+          return this.chat.shutdown(__bind(function() {
+            return process.exit();
+          }, this));
+        }, this));
+      }, this));
+    };
+    return Bot;
+  })();
+  bot = new Bot();
+  bot.run();
 }).call(this);
