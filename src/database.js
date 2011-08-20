@@ -14,7 +14,11 @@
         return this.ensureSchemaUpToDate();
       }, this));
     }
-    Database.prototype.load_all = function(table_name, callback) {};
+    Database.prototype.load_all = function(table_name, callback) {
+      return this.db.all("select * from " + table_name + ";", __bind(function(error, rows) {
+        return callback(rows);
+      }, this));
+    };
     Database.prototype.shutdown = function() {
       return this.db.close();
     };
@@ -23,7 +27,7 @@
         if ((error != null) || !(rows != null)) {
           return this.migrate_from(0);
         } else if (rows[0].version < this.latestVersion()) {
-          return this.migrate_from(currentVersion);
+          return this.migrate_from(rows[0].version);
         }
       }, this));
     };
@@ -46,7 +50,7 @@
       stmt = this.db.prepare("update schema_versions set version = ?");
       return stmt.run(this.latestVersion());
     };
-    Database.migrations = ["create table schema_versions (version NUMBER);", "insert into schema_versions (version) values (0);", "create table triggers (id PRIMARY KEY, trigger TEXT, response TEXT);"];
+    Database.migrations = ["create table schema_versions (version NUMBER);", "insert into schema_versions (version) values (0);", "create table triggers (id PRIMARY KEY, trigger TEXT, response TEXT);", "insert into triggers (trigger, response) values ('gir', 'Yes my master!');"];
     return Database;
   })();
   module.exports = Database;

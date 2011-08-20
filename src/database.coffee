@@ -14,6 +14,8 @@ class Database
   # Given a table name, calls the callback with an array
   # of all entries in the requested table
   load_all: (table_name, callback) ->
+    @db.all "select * from " + table_name + ";", (error, rows) =>
+      callback rows
 
   shutdown: ->
     @db.close()
@@ -24,7 +26,7 @@ class Database
       if error? or not rows?
         this.migrate_from 0
       else if rows[0].version < this.latestVersion()
-        this.migrate_from currentVersion
+        this.migrate_from rows[0].version
 
   latestVersion: ->
     _.size Database.migrations
@@ -55,7 +57,10 @@ class Database
     # Triggers table for how the bot response
     #   trigger - regexp of what to look for
     #   response - text to reply with
-    "create table triggers (id PRIMARY KEY, trigger TEXT, response TEXT);"
+    "create table triggers (id PRIMARY KEY, trigger TEXT, response TEXT);",
+
+    # Initial triggers
+    "insert into triggers (trigger, response) values ('gir', 'Yes my master!');"
   ]
 
 module.exports = Database
