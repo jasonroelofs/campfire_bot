@@ -2,6 +2,7 @@
   "name" : "campfire_bot",
   "version" : "0.0.1",
   "dependencies" : {
-    "sqlite3" : ">= 2.0.x"
+    "sqlite3" : ">= 2.0.x",
+    "underscore" : ">= 1.1.x"
   }
 }
