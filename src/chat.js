@@ -6,12 +6,14 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Campfire = require("../vendor/node-campfire/lib/campfire").Campfire;
   Chat = (function() {
-    function Chat() {
+    function Chat(database) {
+      this.database = database;
       this.runner = new Campfire({
         ssl: true,
         token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2",
         account: "maestroelearning"
       });
+      this.database.load_all("triggers", function(triggers) {});
     }
     Chat.prototype.run = function() {
       return this.runner.join(429966, __bind(function(error, room) {

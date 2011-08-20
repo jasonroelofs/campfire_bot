@@ -1,9 +1,11 @@
-Chat = require("./chat")
-HttpFrontend = require("./http_frontend")
+Chat = require "./chat"
+HttpFrontend = require "./http_frontend"
+Database = require "./database"
 
 class Bot
   constructor: ->
-    @chat = new Chat()
+    @database = new Database()
+    @chat = new Chat(@database)
     @http = new HttpFrontend(@chat)
 
   run: ->
@@ -12,6 +14,7 @@ class Bot
 
     process.on "SIGINT", =>
       console.log "Bot shutting down now!"
+      @database.shutdown()
       @http.shutdown =>
         @chat.shutdown =>
           process.exit()

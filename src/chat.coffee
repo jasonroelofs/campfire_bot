@@ -4,8 +4,10 @@
 Campfire = require("../vendor/node-campfire/lib/campfire").Campfire
 
 class Chat
-  constructor: ->
+  constructor: (@database) ->
     @runner = new Campfire { ssl: true, token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2", account: "maestroelearning"}
+    @database.load_all "triggers", (triggers) ->
+      # Process the triggers
 
   run: ->
     @runner.join 429966, (error, room) =>
