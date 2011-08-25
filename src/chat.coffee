@@ -2,23 +2,53 @@
   Integration with Campfire for sending / recieving messages
 ###
 Campfire = require("../vendor/node-campfire/lib/campfire").Campfire
-Sandbox = require("sandbox")
 _ = require("underscore")._
 
 String::trim ->
   this.replace /^\s+|\s+$/g,""
 
-class Chat
-  constructor: (@database) ->
-    @runner = new Campfire { ssl: true, token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2", account: "maestroelearning"}
-    @sandbox = new Sandbox()
-    this.reloadTriggers()
+class Responder
+  constructor: (regex_or_string, @help, @callback) ->
+    if regex_or_string instanceof String
+      @regex = new RegExp(regex)
+    else
+      @regex = regex_or_string
 
-  reloadTriggers: =>
-    @triggers = {}
-    @database.loadAll "triggers", (triggers) =>
-      _.each triggers, (entry) =>
-        @triggers[entry.trigger] = entry.response
+  runAgainst: (body) =>
+    if matches = body.match @regex
+      @callback matches[1..-1]...
+    else
+      false
+
+class Chat
+  constructor: ->
+    @runner = new Campfire { ssl: true, token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2", account: "maestroelearning" }
+    @pasteHandlers = []
+    @textHandlers = []
+
+    # Default handler no-op by default
+    @defaultHandler = (body) ->
+
+  ##
+  # Register callback for paste message
+  # Takes a regex/string, help text, and a callback
+  ##
+  onPaste: (regex, help, callback) =>
+    @pasteHandlers.push new Responder(regex, help, callback)
+
+  ##
+  # Register callback for text messages.
+  # Takes a regex/string, help text, and a callback
+  ##
+  onText: (regex, help, callback) =>
+    @textHandlers.push new Responder(regex, help, callback)
+
+  ##
+  # Define a fallback message handler that runs if none of the
+  # paste or text handlers find a match
+  ##
+  messageHandler: (defaultText) =>
+    @defaultHandler = defaultText
 
   run: =>
     @runner.join 429966, (error, room) =>
@@ -27,53 +57,30 @@ class Chat
       @runner.me (error, response) =>
         @me = response.user
 
+  ##
+  # Callback from Campfire.
+  # Given a message that isn't from the bot
+  # look for any handlers that match the message
+  ##
   handleMessage: (message) =>
     console.log "Got message ", message
     return if @me.id == message.userId
 
+    matchFound = false
+
     if message.type == "PasteMessage"
-      match = message.body.match /!record (.*)\n(.*)/i
-
-      if match && match.length == 3
-        trigger = match[1].trim()
-        response = match[2].trim()
-
-        # As database is async, we store it locally
-        # to ensure it's immediately available then
-        # send it down to the db
-        @triggers[trigger] = response
-        @database.saveTrigger trigger, response
-
-        console.log "Recorded: ", trigger, " -> ", response
+      _.each @pasteHandlers, (handler) =>
+        if handler.runAgainst(message.body)
+          matchFound = true
 
     else if message.type == "TextMessage"
-      if /!reload/i.test(message.body)
-        this.reloadTriggers()
-        @room.speak "Reloading configuration"
-      else if /^!eval/.test(message.body)
-        matches = message.body.match /!eval (.*)/
-        @sandbox.run matches[1], this.handleEval
-      else if /!help/.test(message.body)
-        this.printHelp()
-      else
-        trigger = this.findTrigger message.body
+      _.each @textHandlers, (handler) =>
+        if handler.runAgainst(message.body)
+          matchFound = true
 
-        if trigger
-          @room.speak @triggers[trigger]
-
-  handleEval: (output) =>
-    @room.speak "eval: " + output.result
-
-  printHelp: =>
-    @room.paste "
-!record message\\nresponse  -- Add a response for the bot to look for (Must be a Paste message)\n
-!eval expression            -- Evaluate said expression (Javascript)\n
-!help                       -- Show this message
-"
-
-  findTrigger: (body) =>
-    _.detect _.keys(@triggers), (trigger) =>
-      (new RegExp(trigger)).test(body)
+    console.log "Message through, did we find? ", matchFound
+    if !matchFound
+      @defaultHandler message
 
   speak: (message) =>
     @room.speak message

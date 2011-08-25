@@ -2,40 +2,59 @@
   /*
     Integration with Campfire for sending / recieving messages
   */
-  var Campfire, Chat, Sandbox, _;
+  var Campfire, Chat, Responder, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Campfire = require("../vendor/node-campfire/lib/campfire").Campfire;
-  Sandbox = require("sandbox");
   _ = require("underscore")._;
   String.prototype.trim(function() {
     return this.replace(/^\s+|\s+$/g, "");
   });
+  Responder = (function() {
+    function Responder(regex_or_string, help, callback) {
+      this.help = help;
+      this.callback = callback;
+      this.runAgainst = __bind(this.runAgainst, this);
+      if (regex_or_string instanceof String) {
+        this.regex = new RegExp(regex);
+      } else {
+        this.regex = regex_or_string;
+      }
+    }
+    Responder.prototype.runAgainst = function(body) {
+      var matches;
+      if (matches = body.match(this.regex)) {
+        return this.callback.apply(this, matches.slice(1));
+      } else {
+        return false;
+      }
+    };
+    return Responder;
+  })();
   Chat = (function() {
-    function Chat(database) {
-      this.database = database;
+    function Chat() {
       this.shutdown = __bind(this.shutdown, this);
       this.speak = __bind(this.speak, this);
-      this.findTrigger = __bind(this.findTrigger, this);
-      this.printHelp = __bind(this.printHelp, this);
-      this.handleEval = __bind(this.handleEval, this);
       this.handleMessage = __bind(this.handleMessage, this);
       this.run = __bind(this.run, this);
-      this.reloadTriggers = __bind(this.reloadTriggers, this);
-      this.runner = new Campfire({
+      this.messageHandler = __bind(this.messageHandler, this);
+      this.onText = __bind(this.onText, this);
+      this.onPaste = __bind(this.onPaste, this);      this.runner = new Campfire({
         ssl: true,
         token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2",
         account: "maestroelearning"
       });
-      this.sandbox = new Sandbox();
-      this.reloadTriggers();
+      this.pasteHandlers = [];
+      this.textHandlers = [];
+      this.defaultHandler = function(body) {};
     }
-    Chat.prototype.reloadTriggers = function() {
-      this.triggers = {};
-      return this.database.loadAll("triggers", __bind(function(triggers) {
-        return _.each(triggers, __bind(function(entry) {
-          return this.triggers[entry.trigger] = entry.response;
-        }, this));
-      }, this));
+    Chat.prototype.onPaste = function(regex, help, callback) {
+      return this.pasteHandlers.push(new Responder(regex, help, callback));
+    };
+    Chat.prototype.onText = function(regex, help, callback) {
+      return this.textHandlers.push(new Responder(regex, help, callback));
+    };
+    Chat.prototype.messageHandler = function(defaultText) {
+      return this.defaultHandler = defaultText;
     };
     Chat.prototype.run = function() {
       return this.runner.join(429966, __bind(function(error, room) {
@@ -47,47 +66,29 @@
       }, this));
     };
     Chat.prototype.handleMessage = function(message) {
-      var match, matches, response, trigger;
+      var matchFound;
       console.log("Got message ", message);
       if (this.me.id === message.userId) {
         return;
       }
+      matchFound = false;
       if (message.type === "PasteMessage") {
-        match = message.body.match(/!record (.*)\n(.*)/i);
-        if (match && match.length === 3) {
-          trigger = match[1].trim();
-          response = match[2].trim();
-          this.triggers[trigger] = response;
-          this.database.saveTrigger(trigger, response);
-          return console.log("Recorded: ", trigger, " -> ", response);
-        }
-      } else if (message.type === "TextMessage") {
-        if (/!reload/i.test(message.body)) {
-          this.reloadTriggers();
-          return this.room.speak("Reloading configuration");
-        } else if (/^!eval/.test(message.body)) {
-          matches = message.body.match(/!eval (.*)/);
-          return this.sandbox.run(matches[1], this.handleEval);
-        } else if (/!help/.test(message.body)) {
-          return this.printHelp();
-        } else {
-          trigger = this.findTrigger(message.body);
-          if (trigger) {
-            return this.room.speak(this.triggers[trigger]);
+        _.each(this.pasteHandlers, __bind(function(handler) {
+          if (handler.runAgainst(message.body)) {
+            return matchFound = true;
           }
-        }
+        }, this));
+      } else if (message.type === "TextMessage") {
+        _.each(this.textHandlers, __bind(function(handler) {
+          if (handler.runAgainst(message.body)) {
+            return matchFound = true;
+          }
+        }, this));
       }
-    };
-    Chat.prototype.handleEval = function(output) {
-      return this.room.speak("eval: " + output.result);
-    };
-    Chat.prototype.printHelp = function() {
-      return this.room.paste("!record message\\nresponse  -- Add a response for the bot to look for (Must be a Paste message)\n!eval expression            -- Evaluate said expression (Javascript)\n!help                       -- Show this message");
-    };
-    Chat.prototype.findTrigger = function(body) {
-      return _.detect(_.keys(this.triggers), __bind(function(trigger) {
-        return (new RegExp(trigger)).test(body);
-      }, this));
+      console.log("Message through, did we find? ", matchFound);
+      if (!matchFound) {
+        return this.defaultHandler(message);
+      }
     };
     Chat.prototype.speak = function(message) {
       return this.room.speak(message);
