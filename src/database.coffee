@@ -7,7 +7,7 @@ _ = require("underscore")._
 
 class Database
   constructor: ->
-    @db = new sqlite3.Database "db/database.sqlite3"
+    @db = new sqlite3.Database "db/database.db"
     @db.serialize =>
       this.ensureSchemaUpToDate()
 
@@ -60,7 +60,7 @@ class Database
     "create table triggers (id PRIMARY KEY, trigger TEXT, response TEXT);",
 
     # Initial triggers
-    "insert into triggers (trigger, response) values ('gir', 'Yes my master!');"
+    "insert into triggers (trigger, response) values ('gir', 'http://images2.wikia.nocookie.net/__cb20070612213825/uncyclopedia/images/thumb/c/c1/Duty_Mode_GIR.jpg/96px-Duty_Mode_GIR.jpg');"
   ]
 
 module.exports = Database

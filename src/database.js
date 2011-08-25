@@ -9,7 +9,7 @@
   _ = require("underscore")._;
   Database = (function() {
     function Database() {
-      this.db = new sqlite3.Database("db/database.sqlite3");
+      this.db = new sqlite3.Database("db/database.db");
       this.db.serialize(__bind(function() {
         return this.ensureSchemaUpToDate();
       }, this));
@@ -50,7 +50,7 @@
       stmt = this.db.prepare("update schema_versions set version = ?");
       return stmt.run(this.latestVersion());
     };
-    Database.migrations = ["create table schema_versions (version NUMBER);", "insert into schema_versions (version) values (0);", "create table triggers (id PRIMARY KEY, trigger TEXT, response TEXT);", "insert into triggers (trigger, response) values ('gir', 'Yes my master!');"];
+    Database.migrations = ["create table schema_versions (version NUMBER);", "insert into schema_versions (version) values (0);", "create table triggers (id PRIMARY KEY, trigger TEXT, response TEXT);", "insert into triggers (trigger, response) values ('gir', 'http://images2.wikia.nocookie.net/__cb20070612213825/uncyclopedia/images/thumb/c/c1/Duty_Mode_GIR.jpg/96px-Duty_Mode_GIR.jpg');"];
     return Database;
   })();
   module.exports = Database;
