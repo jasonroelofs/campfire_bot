@@ -14,8 +14,8 @@
         return this.ensureSchemaUpToDate();
       }, this));
     }
-    Database.prototype.load_all = function(table_name, callback) {
-      return this.db.all("select * from " + table_name + ";", __bind(function(error, rows) {
+    Database.prototype.loadAll = function(tableName, callback) {
+      return this.db.all("select * from " + tableName + ";", __bind(function(error, rows) {
         return callback(rows);
       }, this));
     };
@@ -25,16 +25,16 @@
     Database.prototype.ensureSchemaUpToDate = function() {
       return this.db.all("select version from schema_versions", __bind(function(error, rows) {
         if ((error != null) || !(rows != null)) {
-          return this.migrate_from(0);
+          return this.migrateFrom(0);
         } else if (rows[0].version < this.latestVersion()) {
-          return this.migrate_from(rows[0].version);
+          return this.migrateFrom(rows[0].version);
         }
       }, this));
     };
     Database.prototype.latestVersion = function() {
       return _.size(Database.migrations);
     };
-    Database.prototype.migrate_from = function(version) {
+    Database.prototype.migrateFrom = function(version) {
       var query, stmt, _i, _len, _ref;
       console.log("Migrating from version ", version);
       _ref = Database.migrations.slice(version);

@@ -13,8 +13,8 @@ class Database
 
   # Given a table name, calls the callback with an array
   # of all entries in the requested table
-  load_all: (table_name, callback) ->
-    @db.all "select * from " + table_name + ";", (error, rows) =>
+  loadAll: (tableName, callback) ->
+    @db.all "select * from " + tableName + ";", (error, rows) =>
       callback rows
 
   shutdown: ->
@@ -24,14 +24,14 @@ class Database
   ensureSchemaUpToDate: ->
     @db.all "select version from schema_versions", (error, rows) =>
       if error? or not rows?
-        this.migrate_from 0
+        this.migrateFrom 0
       else if rows[0].version < this.latestVersion()
-        this.migrate_from rows[0].version
+        this.migrateFrom rows[0].version
 
   latestVersion: ->
     _.size Database.migrations
 
-  migrate_from: (version) ->
+  migrateFrom: (version) ->
     console.log "Migrating from version ", version
 
     for query in Database.migrations[version..-1]
