@@ -6,8 +6,11 @@ _ = require("underscore")._
 
 class Chat
   constructor: (@database) ->
-    @triggers = {}
     @runner = new Campfire { ssl: true, token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2", account: "maestroelearning"}
+    this.reloadTriggers()
+
+  reloadTriggers: =>
+    @triggers = {}
     @database.load_all "triggers", (triggers) =>
       _.each triggers, (entry) =>
         @triggers[entry.trigger] = entry.response
@@ -22,12 +25,19 @@ class Chat
   handleMessage: (message) =>
     console.log "Got message ", message
     if message.type == "TextMessage" and @me.id != message.userId
-      trigger = this.findTrigger message.body
-      @room.speak @triggers[trigger] if trigger
+
+      if /!reload/i.test(message.body)
+        this.reloadTriggers()
+        @room.speak "Reloading configuration"
+      else
+        trigger = this.findTrigger message.body
+
+        if trigger
+          @room.speak @triggers[trigger]
 
   findTrigger: (body) =>
-    regex = new RegExp body, "i"
-    _.detect _.keys(@triggers), (trigger) => regex.test trigger
+    _.detect _.keys(@triggers), (trigger) =>
+      (new RegExp(trigger)).test(body)
 
   speak: (message) =>
     @room.speak message

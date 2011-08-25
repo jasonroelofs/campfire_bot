@@ -14,18 +14,22 @@
       this.findTrigger = __bind(this.findTrigger, this);
       this.handleMessage = __bind(this.handleMessage, this);
       this.run = __bind(this.run, this);
-      this.triggers = {};
+      this.reloadTriggers = __bind(this.reloadTriggers, this);
       this.runner = new Campfire({
         ssl: true,
         token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2",
         account: "maestroelearning"
       });
-      this.database.load_all("triggers", __bind(function(triggers) {
+      this.reloadTriggers();
+    }
+    Chat.prototype.reloadTriggers = function() {
+      this.triggers = {};
+      return this.database.load_all("triggers", __bind(function(triggers) {
         return _.each(triggers, __bind(function(entry) {
           return this.triggers[entry.trigger] = entry.response;
         }, this));
       }, this));
-    }
+    };
     Chat.prototype.run = function() {
       return this.runner.join(429966, __bind(function(error, room) {
         this.room = room;
@@ -39,17 +43,20 @@
       var trigger;
       console.log("Got message ", message);
       if (message.type === "TextMessage" && this.me.id !== message.userId) {
-        trigger = this.findTrigger(message.body);
-        if (trigger) {
-          return this.room.speak(this.triggers[trigger]);
+        if (/!reload/i.test(message.body)) {
+          this.reloadTriggers();
+          return this.room.speak("Reloading configuration");
+        } else {
+          trigger = this.findTrigger(message.body);
+          if (trigger) {
+            return this.room.speak(this.triggers[trigger]);
+          }
         }
       }
     };
     Chat.prototype.findTrigger = function(body) {
-      var regex;
-      regex = new RegExp(body, "i");
       return _.detect(_.keys(this.triggers), __bind(function(trigger) {
-        return regex.test(trigger);
+        return (new RegExp(trigger)).test(body);
       }, this));
     };
     Chat.prototype.speak = function(message) {
