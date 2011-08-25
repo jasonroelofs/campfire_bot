@@ -6,6 +6,9 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Campfire = require("../vendor/node-campfire/lib/campfire").Campfire;
   _ = require("underscore")._;
+  String.prototype.trim(function() {
+    return this.replace(/^\s+|\s+$/g, "");
+  });
   Chat = (function() {
     function Chat(database) {
       this.database = database;
@@ -24,7 +27,7 @@
     }
     Chat.prototype.reloadTriggers = function() {
       this.triggers = {};
-      return this.database.load_all("triggers", __bind(function(triggers) {
+      return this.database.loadAll("triggers", __bind(function(triggers) {
         return _.each(triggers, __bind(function(entry) {
           return this.triggers[entry.trigger] = entry.response;
         }, this));
@@ -40,9 +43,21 @@
       }, this));
     };
     Chat.prototype.handleMessage = function(message) {
-      var trigger;
+      var match, response, trigger;
       console.log("Got message ", message);
-      if (message.type === "TextMessage" && this.me.id !== message.userId) {
+      if (this.me.id === message.userId) {
+        return;
+      }
+      if (message.type === "PasteMessage") {
+        match = message.body.match(/!record (.*)\n(.*)/i);
+        if (match.length === 3) {
+          trigger = match[1].trim();
+          response = match[2].trim();
+          this.triggers[trigger] = response;
+          this.database.saveTrigger(trigger, response);
+          return console.log("Recorded: ", trigger, " -> ", response);
+        }
+      } else if (message.type === "TextMessage") {
         if (/!reload/i.test(message.body)) {
           this.reloadTriggers();
           return this.room.speak("Reloading configuration");

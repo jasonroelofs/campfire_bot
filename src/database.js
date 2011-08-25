@@ -19,6 +19,12 @@
         return callback(rows);
       }, this));
     };
+    Database.prototype.saveTrigger = function(trigger, response) {
+      var stmt;
+      stmt = this.db.prepare("insert into triggers (trigger, response) values (?, ?)");
+      stmt.run(trigger, response);
+      return stmt.finalize();
+    };
     Database.prototype.shutdown = function() {
       return this.db.close();
     };
