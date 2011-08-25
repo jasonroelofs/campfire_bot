@@ -2,6 +2,7 @@
   Integration with Campfire for sending / recieving messages
 ###
 Campfire = require("../vendor/node-campfire/lib/campfire").Campfire
+Sandbox = require("sandbox")
 _ = require("underscore")._
 
 String::trim ->
@@ -10,6 +11,7 @@ String::trim ->
 class Chat
   constructor: (@database) ->
     @runner = new Campfire { ssl: true, token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2", account: "maestroelearning"}
+    @sandbox = new Sandbox()
     this.reloadTriggers()
 
   reloadTriggers: =>
@@ -47,11 +49,17 @@ class Chat
       if /!reload/i.test(message.body)
         this.reloadTriggers()
         @room.speak "Reloading configuration"
+      else if /^!eval/.test(message.body)
+        matches = message.body.match /!eval (.*)/
+        @sandbox.run matches[1], this.handleEval
       else
         trigger = this.findTrigger message.body
 
         if trigger
           @room.speak @triggers[trigger]
+
+  handleEval: (output) =>
+    @room.speak "eval: " + output.result
 
   findTrigger: (body) =>
     _.detect _.keys(@triggers), (trigger) =>
