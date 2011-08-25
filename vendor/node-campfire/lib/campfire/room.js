@@ -27,6 +27,7 @@ Room.prototype.listen = function(callback) {
   }
 
   var campfire = this.campfire,
+      self = this,
       options  = {
         host    : "streaming.campfirenow.com",
         port    : campfire.port,
@@ -50,6 +51,9 @@ Room.prototype.listen = function(callback) {
 
         callback(new Message(campfire, data));
       });
+    });
+    response.on("end", function() {
+      self.listen(callback);
     });
   }).end();
 };
