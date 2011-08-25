@@ -16,6 +16,7 @@
       this.shutdown = __bind(this.shutdown, this);
       this.speak = __bind(this.speak, this);
       this.findTrigger = __bind(this.findTrigger, this);
+      this.printHelp = __bind(this.printHelp, this);
       this.handleEval = __bind(this.handleEval, this);
       this.handleMessage = __bind(this.handleMessage, this);
       this.run = __bind(this.run, this);
@@ -53,7 +54,7 @@
       }
       if (message.type === "PasteMessage") {
         match = message.body.match(/!record (.*)\n(.*)/i);
-        if (match.length === 3) {
+        if (match && match.length === 3) {
           trigger = match[1].trim();
           response = match[2].trim();
           this.triggers[trigger] = response;
@@ -67,6 +68,8 @@
         } else if (/^!eval/.test(message.body)) {
           matches = message.body.match(/!eval (.*)/);
           return this.sandbox.run(matches[1], this.handleEval);
+        } else if (/!help/.test(message.body)) {
+          return this.printHelp();
         } else {
           trigger = this.findTrigger(message.body);
           if (trigger) {
@@ -77,6 +80,9 @@
     };
     Chat.prototype.handleEval = function(output) {
       return this.room.speak("eval: " + output.result);
+    };
+    Chat.prototype.printHelp = function() {
+      return this.room.paste("!record message\\nresponse  -- Add a response for the bot to look for (Must be a Paste message)\n!eval expression            -- Evaluate said expression (Javascript)\n!help                       -- Show this message");
     };
     Chat.prototype.findTrigger = function(body) {
       return _.detect(_.keys(this.triggers), __bind(function(trigger) {

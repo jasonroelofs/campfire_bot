@@ -30,10 +30,11 @@ class Chat
   handleMessage: (message) =>
     console.log "Got message ", message
     return if @me.id == message.userId
+
     if message.type == "PasteMessage"
       match = message.body.match /!record (.*)\n(.*)/i
 
-      if match.length == 3
+      if match && match.length == 3
         trigger = match[1].trim()
         response = match[2].trim()
 
@@ -52,6 +53,8 @@ class Chat
       else if /^!eval/.test(message.body)
         matches = message.body.match /!eval (.*)/
         @sandbox.run matches[1], this.handleEval
+      else if /!help/.test(message.body)
+        this.printHelp()
       else
         trigger = this.findTrigger message.body
 
@@ -60,6 +63,13 @@ class Chat
 
   handleEval: (output) =>
     @room.speak "eval: " + output.result
+
+  printHelp: =>
+    @room.paste "
+!record message\\nresponse  -- Add a response for the bot to look for (Must be a Paste message)\n
+!eval expression            -- Evaluate said expression (Javascript)\n
+!help                       -- Show this message
+"
 
   findTrigger: (body) =>
     _.detect _.keys(@triggers), (trigger) =>
