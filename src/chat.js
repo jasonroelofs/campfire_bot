@@ -42,7 +42,7 @@
         this.room = room;
         this.room.listen(this.handleMessage);
         return this.runner.me(__bind(function(error, response) {
-          return this.me = response;
+          return this.me = response.user;
         }, this));
       }, this));
     };

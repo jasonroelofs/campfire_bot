@@ -25,7 +25,7 @@ class Chat
       @room = room
       @room.listen this.handleMessage
       @runner.me (error, response) =>
-        @me = response
+        @me = response.user
 
   handleMessage: (message) =>
     console.log "Got message ", message
