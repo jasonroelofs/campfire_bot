@@ -14,6 +14,9 @@ class Responder
     else
       @regex = regex_or_string
 
+  getHelp: =>
+    [@regex, "\t" + @help].join "\n"
+
   runAgainst: (body) =>
     if matches = body.match @regex
       @callback matches[1..-1]...
@@ -52,6 +55,7 @@ class Chat
 
   run: =>
     @runner.join 429966, (error, room) =>
+      console.log "Joined room: ", room.name
       @room = room
       @room.listen this.handleMessage
       @runner.me (error, response) =>
@@ -81,6 +85,18 @@ class Chat
     console.log "Message through, did we find? ", matchFound
     if !matchFound
       @defaultHandler message
+
+  printHelp: =>
+    toSay = ["I respond the following commands", ""]
+
+    toSay.push " --- Paste Message Commands --- "
+    _.each @pasteHandlers, (handler) => toSay.push handler.getHelp()
+    toSay.push ""
+
+    toSay.push " --- Text Message Commands --- "
+    _.each @textHandlers, (handler) => toSay.push handler.getHelp()
+
+    @room.paste toSay.join "\n"
 
   speak: (message) =>
     @room.speak message

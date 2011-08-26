@@ -14,12 +14,16 @@
       this.help = help;
       this.callback = callback;
       this.runAgainst = __bind(this.runAgainst, this);
+      this.getHelp = __bind(this.getHelp, this);
       if (regex_or_string instanceof String) {
         this.regex = new RegExp(regex);
       } else {
         this.regex = regex_or_string;
       }
     }
+    Responder.prototype.getHelp = function() {
+      return [this.regex, "\t" + this.help].join("\n");
+    };
     Responder.prototype.runAgainst = function(body) {
       var matches;
       if (matches = body.match(this.regex)) {
@@ -34,6 +38,7 @@
     function Chat() {
       this.shutdown = __bind(this.shutdown, this);
       this.speak = __bind(this.speak, this);
+      this.printHelp = __bind(this.printHelp, this);
       this.handleMessage = __bind(this.handleMessage, this);
       this.run = __bind(this.run, this);
       this.messageHandler = __bind(this.messageHandler, this);
@@ -58,6 +63,7 @@
     };
     Chat.prototype.run = function() {
       return this.runner.join(429966, __bind(function(error, room) {
+        console.log("Joined room: ", room.name);
         this.room = room;
         this.room.listen(this.handleMessage);
         return this.runner.me(__bind(function(error, response) {
@@ -89,6 +95,20 @@
       if (!matchFound) {
         return this.defaultHandler(message);
       }
+    };
+    Chat.prototype.printHelp = function() {
+      var toSay;
+      toSay = ["I respond the following commands", ""];
+      toSay.push(" --- Paste Message Commands --- ");
+      _.each(this.pasteHandlers, __bind(function(handler) {
+        return toSay.push(handler.getHelp());
+      }, this));
+      toSay.push("");
+      toSay.push(" --- Text Message Commands --- ");
+      _.each(this.textHandlers, __bind(function(handler) {
+        return toSay.push(handler.getHelp());
+      }, this));
+      return this.room.paste(toSay.join("\n"));
     };
     Chat.prototype.speak = function(message) {
       return this.room.speak(message);
