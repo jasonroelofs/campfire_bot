@@ -3,4 +3,6 @@ var Config = {
   apiKey: "[api key]",
   roomId: [roomId],
   debug: false
-}
+};
+
+module.exports = Config;
