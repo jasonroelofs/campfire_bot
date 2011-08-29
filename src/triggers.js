@@ -14,6 +14,7 @@
       this.reload();
     }
     Triggers.prototype.reload = function() {
+      console.log("Loading all triggers");
       this.triggers = {};
       return this.database.loadAll("triggers", __bind(function(triggers) {
         return _.each(triggers, __bind(function(entry) {

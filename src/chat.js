@@ -2,10 +2,11 @@
   /*
     Integration with Campfire for sending / recieving messages
   */
-  var Campfire, Chat, Responder, _;
+  var Campfire, Chat, Config, Responder, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Campfire = require("../vendor/node-campfire/lib/campfire").Campfire;
   _ = require("underscore")._;
+  Config = require("../config/config");
   String.prototype.trim(function() {
     return this.replace(/^\s+|\s+$/g, "");
   });
@@ -45,8 +46,8 @@
       this.onText = __bind(this.onText, this);
       this.onPaste = __bind(this.onPaste, this);      this.runner = new Campfire({
         ssl: true,
-        token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2",
-        account: "maestroelearning"
+        token: Config.apiKey,
+        account: Config.subdomain
       });
       this.pasteHandlers = [];
       this.textHandlers = [];
@@ -62,7 +63,7 @@
       return this.defaultHandler = defaultText;
     };
     Chat.prototype.run = function() {
-      return this.runner.join(429966, __bind(function(error, room) {
+      return this.runner.join(Config.roomId, __bind(function(error, room) {
         console.log("Joined room: ", room.name);
         this.room = room;
         this.room.listen(this.handleMessage);
@@ -73,7 +74,9 @@
     };
     Chat.prototype.handleMessage = function(message) {
       var matchFound;
-      console.log("Got message ", message);
+      if (Config.debug) {
+        console.log("Got message ", message);
+      }
       if (this.me.id === message.userId) {
         return;
       }
@@ -91,7 +94,9 @@
           }
         }, this));
       }
-      console.log("Message through, did we find? ", matchFound);
+      if (Config.debug) {
+        console.log("Message through, did we find? ", matchFound);
+      }
       if (!matchFound) {
         return this.defaultHandler(message);
       }

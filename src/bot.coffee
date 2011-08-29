@@ -4,6 +4,8 @@ Database = require "./database"
 Triggers = require "./triggers"
 Sandbox = require "sandbox"
 
+Config = require "../config/config"
+
 class Bot
   constructor: ->
     @database = new Database()
@@ -36,8 +38,9 @@ class Bot
   # falls back to this callback
   ##
   handleMessage: (message) =>
-    console.log "Got message: ", message.body
+    console.log "Got message: ", message.body if Config.debug
     if response = @triggers.findIn(message.body)
+      console.log "Got response from triggers: ", response if Config.debug
       @chat.speak response
 
   handleEval: (output) =>

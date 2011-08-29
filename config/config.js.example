@@ -1,0 +1,6 @@
+var Config = {
+  subdomain: "[subdomain]",
+  apiKey: "[api key]",
+  roomId: [roomId],
+  debug: false
+}

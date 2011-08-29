@@ -1,11 +1,12 @@
 (function() {
-  var Bot, Chat, Database, HttpFrontend, Sandbox, Triggers, bot;
+  var Bot, Chat, Config, Database, HttpFrontend, Sandbox, Triggers, bot;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Chat = require("./chat");
   HttpFrontend = require("./http_frontend");
   Database = require("./database");
   Triggers = require("./triggers");
   Sandbox = require("sandbox");
+  Config = require("../config/config");
   Bot = (function() {
     function Bot() {
       this.handleEval = __bind(this.handleEval, this);
@@ -33,8 +34,13 @@
     };
     Bot.prototype.handleMessage = function(message) {
       var response;
-      console.log("Got message: ", message.body);
+      if (Config.debug) {
+        console.log("Got message: ", message.body);
+      }
       if (response = this.triggers.findIn(message.body)) {
+        if (Config.debug) {
+          console.log("Got response from triggers: ", response);
+        }
         return this.chat.speak(response);
       }
     };

@@ -8,6 +8,7 @@ class Triggers
     this.reload()
 
   reload: =>
+    console.log "Loading all triggers"
     @triggers = {}
     @database.loadAll "triggers", (triggers) =>
       _.each triggers, (entry) =>
@@ -34,8 +35,5 @@ class Triggers
 
     if found
       @triggers[found]
-
-
-
 
 module.exports = Triggers

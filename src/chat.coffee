@@ -4,6 +4,8 @@
 Campfire = require("../vendor/node-campfire/lib/campfire").Campfire
 _ = require("underscore")._
 
+Config = require "../config/config"
+
 String::trim ->
   this.replace /^\s+|\s+$/g,""
 
@@ -25,7 +27,7 @@ class Responder
 
 class Chat
   constructor: ->
-    @runner = new Campfire { ssl: true, token: "b36e890502f03151a05c0f08babcdfbd33d2f7e2", account: "maestroelearning" }
+    @runner = new Campfire { ssl: true, token: Config.apiKey, account: Config.subdomain }
     @pasteHandlers = []
     @textHandlers = []
 
@@ -54,7 +56,7 @@ class Chat
     @defaultHandler = defaultText
 
   run: =>
-    @runner.join 429966, (error, room) =>
+    @runner.join Config.roomId, (error, room) =>
       console.log "Joined room: ", room.name
       @room = room
       @room.listen this.handleMessage
@@ -67,7 +69,7 @@ class Chat
   # look for any handlers that match the message
   ##
   handleMessage: (message) =>
-    console.log "Got message ", message
+    console.log "Got message ", message if Config.debug
     return if @me.id == message.userId
 
     matchFound = false
@@ -82,7 +84,7 @@ class Chat
         if handler.runAgainst(message.body)
           matchFound = true
 
-    console.log "Message through, did we find? ", matchFound
+    console.log "Message through, did we find? ", matchFound if Config.debug
     if !matchFound
       @defaultHandler message
 
