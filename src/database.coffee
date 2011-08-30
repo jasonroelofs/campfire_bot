@@ -17,7 +17,7 @@ class Database
     @db.all "select * from " + tableName + ";", (error, rows) =>
       callback rows
 
-  saveTrigger: (trigger, response) ->
+  addTrigger: (trigger, response) ->
     stmt = @db.prepare "insert into triggers (trigger, response) values (?, ?)"
     stmt.run(trigger, response)
     stmt.finalize()
