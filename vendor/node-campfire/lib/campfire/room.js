@@ -34,6 +34,7 @@ Room.prototype.listen = function(callback) {
         method  : "GET",
         path    : this.path + "/live.json",
         headers : {
+          "Connection"    : "keep-alive",
           "Host"          : "streaming.campfirenow.com",
           "Authorization" : campfire.authorization
         }
