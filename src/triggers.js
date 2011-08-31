@@ -29,7 +29,7 @@
     Triggers.prototype.findIn = function(body) {
       var found;
       found = _.detect(_.keys(this.triggers), __bind(function(trigger) {
-        return (new RegExp(trigger)).test(body);
+        return (new RegExp(trigger, "i")).test(body);
       }, this));
       if (found) {
         return this.triggers[found];

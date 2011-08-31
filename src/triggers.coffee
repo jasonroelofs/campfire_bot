@@ -31,7 +31,7 @@ class Triggers
   findIn: (body) =>
     found =
       _.detect _.keys(@triggers), (trigger) =>
-        (new RegExp(trigger)).test(body)
+        (new RegExp(trigger, "i")).test(body)
 
     if found
       @triggers[found]
