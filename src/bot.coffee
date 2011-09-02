@@ -9,7 +9,10 @@ Config = require "../config/config"
 class Bot
   constructor: ->
     @database = new Database()
+
     @chat = new Chat()
+    @chat.connect()
+
     @http = new HttpFrontend(@chat)
 
     @triggers = new Triggers(@database)

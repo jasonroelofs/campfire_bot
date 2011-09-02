@@ -27,12 +27,15 @@ class Responder
 
 class Chat
   constructor: ->
-    @runner = new Campfire { ssl: true, token: Config.apiKey, account: Config.subdomain }
+    @runner = null
     @pasteHandlers = []
     @textHandlers = []
 
     # Default handler no-op by default
     @defaultHandler = (body) ->
+
+  connect: ->
+    @runner = new Campfire { ssl: true, token: Config.apiKey, account: Config.subdomain }
 
   ##
   # Register callback for paste message

@@ -44,15 +44,18 @@
       this.run = __bind(this.run, this);
       this.messageHandler = __bind(this.messageHandler, this);
       this.onText = __bind(this.onText, this);
-      this.onPaste = __bind(this.onPaste, this);      this.runner = new Campfire({
-        ssl: true,
-        token: Config.apiKey,
-        account: Config.subdomain
-      });
+      this.onPaste = __bind(this.onPaste, this);      this.runner = null;
       this.pasteHandlers = [];
       this.textHandlers = [];
       this.defaultHandler = function(body) {};
     }
+    Chat.prototype.connect = function() {
+      return this.runner = new Campfire({
+        ssl: true,
+        token: Config.apiKey,
+        account: Config.subdomain
+      });
+    };
     Chat.prototype.onPaste = function(regex, help, callback) {
       return this.pasteHandlers.push(new Responder(regex, help, callback));
     };

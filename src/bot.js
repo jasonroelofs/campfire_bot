@@ -12,6 +12,7 @@
       this.handleEval = __bind(this.handleEval, this);
       this.handleMessage = __bind(this.handleMessage, this);      this.database = new Database();
       this.chat = new Chat();
+      this.chat.connect();
       this.http = new HttpFrontend(this.chat);
       this.triggers = new Triggers(this.database);
       this.triggers.reload();
