@@ -1,3 +1,5 @@
+require './spec_helper'
+
 Triggers = require "./../src/triggers"
 _ = require("underscore")._
 
@@ -6,15 +8,6 @@ describe "Triggers", ->
   triggers = null
 
   beforeEach ->
-    console.log = jasmine.createSpy
-
-    this.addMatchers {
-      # Matcher to see if the resulting value is in the
-      # passed in array
-      toBeIn: (array) ->
-        _.include array, this.actual
-    }
-
     database = {}
     database.loadAll = jasmine.createSpy "loadAll Spy"
     database.addTrigger = jasmine.createSpy "addTrigger Spy"
