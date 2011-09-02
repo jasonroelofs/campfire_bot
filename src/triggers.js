@@ -13,7 +13,7 @@
       this.findIn = __bind(this.findIn, this);
       this.add = __bind(this.add, this);
       this.reload = __bind(this.reload, this);
-      this.reload();
+      this.triggers = {};
     }
     Triggers.prototype.reload = function() {
       console.log("Loading all triggers");

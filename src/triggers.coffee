@@ -6,7 +6,7 @@ Config = require "../config/config"
 
 class Triggers
   constructor: (@database) ->
-    this.reload()
+    @triggers = {}
 
   reload: =>
     console.log "Loading all triggers"

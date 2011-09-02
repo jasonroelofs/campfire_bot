@@ -11,7 +11,10 @@ class Bot
     @database = new Database()
     @chat = new Chat()
     @http = new HttpFrontend(@chat)
+
     @triggers = new Triggers(@database)
+    @triggers.reload()
+
     @sandbox = new Sandbox()
 
     this.registerChatHooks()

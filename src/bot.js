@@ -14,6 +14,7 @@
       this.chat = new Chat();
       this.http = new HttpFrontend(this.chat);
       this.triggers = new Triggers(this.database);
+      this.triggers.reload();
       this.sandbox = new Sandbox();
       this.registerChatHooks();
     }
