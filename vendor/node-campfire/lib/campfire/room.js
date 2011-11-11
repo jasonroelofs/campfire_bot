@@ -54,12 +54,8 @@ Room.prototype.listen = function(callback) {
       });
     });
     response.on("end", function() {
-      console.log("Got END event, restarting");
-      self.listen(callback);
-    });
-    response.on("close", function(err) {
-      console.log("Got CLOSE event, restarting: ", err);
-      self.listen(callback);
+      console.log("Streaming closed, exiting");
+      process.exit(1);
     });
   }).end();
 };
