@@ -5,6 +5,7 @@ Triggers = require "./triggers"
 Sandbox = require "sandbox"
 
 Config = require "../config/config"
+_ = require("underscore")._
 
 class Bot
   constructor: ->
@@ -39,7 +40,23 @@ class Bot
 
     @chat.onText "!list", "List all known triggers",
       =>
-        @chat.paste "I respond to the following:\n  " + @triggers.all().join(", ")
+        @chat.paste "I respond to the following:\n  " + @triggers.all().join ", "
+
+    @chat.onText "!remove (.*)", "!remove [trigger] [responseIndex]. Removes the pair. If no index is given lists out all responses for the given trigger.",
+      (input) =>
+        parsed = input.split " "
+        trigger = parsed[0]
+        responseIndex = parsed[1]
+
+        if not responseIndex?
+          msg = "I know the following responses for \"#{trigger}\"\n"
+          _.each @triggers.responsesFor(trigger), (response, index) ->
+            msg += " [#{index}] #{response}\n"
+
+          @chat.paste msg
+        else
+          @triggers.removeResponse trigger, parseInt(responseIndex)
+          @chat.speak "Response removed"
 
     @chat.messageHandler this.handleMessage
 

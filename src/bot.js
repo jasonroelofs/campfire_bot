@@ -1,5 +1,5 @@
 (function() {
-  var Bot, Chat, Config, Database, HttpFrontend, Sandbox, Triggers, bot;
+  var Bot, Chat, Config, Database, HttpFrontend, Sandbox, Triggers, bot, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Chat = require("./chat");
   HttpFrontend = require("./http_frontend");
@@ -7,6 +7,7 @@
   Triggers = require("./triggers");
   Sandbox = require("sandbox");
   Config = require("../config/config");
+  _ = require("underscore")._;
   Bot = (function() {
     function Bot() {
       this.handleEval = __bind(this.handleEval, this);
@@ -34,6 +35,22 @@
       }, this));
       this.chat.onText("!list", "List all known triggers", __bind(function() {
         return this.chat.paste("I respond to the following:\n  " + this.triggers.all().join(", "));
+      }, this));
+      this.chat.onText("!remove (.*)", "!remove [trigger] [responseIndex]. Removes the pair. If no index is given lists out all responses for the given trigger.", __bind(function(input) {
+        var msg, parsed, responseIndex, trigger;
+        parsed = input.split(" ");
+        trigger = parsed[0];
+        responseIndex = parsed[1];
+        if (!(responseIndex != null)) {
+          msg = "I know the following responses for \"" + trigger + "\"\n";
+          _.each(this.triggers.responsesFor(trigger), function(response, index) {
+            return msg += " [" + index + "] " + response + "\n";
+          });
+          return this.chat.paste(msg);
+        } else {
+          this.triggers.removeResponse(trigger, parseInt(responseIndex));
+          return this.chat.speak("Response removed");
+        }
       }, this));
       return this.chat.messageHandler(this.handleMessage);
     };
