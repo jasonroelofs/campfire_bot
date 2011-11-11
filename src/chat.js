@@ -38,6 +38,7 @@
   Chat = (function() {
     function Chat() {
       this.shutdown = __bind(this.shutdown, this);
+      this.paste = __bind(this.paste, this);
       this.speak = __bind(this.speak, this);
       this.printHelp = __bind(this.printHelp, this);
       this.handleMessage = __bind(this.handleMessage, this);
@@ -120,6 +121,9 @@
     };
     Chat.prototype.speak = function(message) {
       return this.room.speak(message);
+    };
+    Chat.prototype.paste = function(message) {
+      return this.room.paste(message);
     };
     Chat.prototype.shutdown = function(callback) {
       return this.room.leave(function() {

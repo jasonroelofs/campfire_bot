@@ -106,6 +106,9 @@ class Chat
   speak: (message) =>
     @room.speak message
 
+  paste: (message) =>
+    @room.paste message
+
   shutdown: (callback) =>
     @room.leave ->
       console.log "Left campfire room"

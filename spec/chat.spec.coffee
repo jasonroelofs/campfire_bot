@@ -89,6 +89,10 @@ describe "Chat", ->
     chat.speak "This is a message"
     expect(room.speak).toHaveBeenCalledWith "This is a message"
 
+  it "sends a paste message to campfire room", ->
+    chat.paste "I paste a lot of things"
+    expect(room.paste).toHaveBeenCalledWith "I paste a lot of things"
+
   it "shows help message of all message handlers", ->
     chat.onPaste /doing\n(.*)/, "Doing Something", (found) ->
     chat.onText /Hello (\d+)/, "Find a number", (found) ->
