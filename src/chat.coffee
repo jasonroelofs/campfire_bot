@@ -22,6 +22,7 @@ class Responder
   runAgainst: (body) =>
     if matches = body.match @regex
       @callback matches[1..-1]...
+      true
     else
       false
 

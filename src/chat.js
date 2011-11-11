@@ -28,7 +28,8 @@
     Responder.prototype.runAgainst = function(body) {
       var matches;
       if (matches = body.match(this.regex)) {
-        return this.callback.apply(this, matches.slice(1));
+        this.callback.apply(this, matches.slice(1));
+        return true;
       } else {
         return false;
       }
