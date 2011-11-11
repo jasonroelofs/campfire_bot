@@ -47,3 +47,14 @@ describe "Triggers", ->
     _(10).times ->
       expect(triggers.findIn("I'm looking for a TrIGGeR in here")).toBeIn expected
       expect(triggers.findIn("I'm looking for a TrIGGeR in here")).not.toBeIn notExpected
+
+  it "can be asked for all triggers currently known", ->
+    triggers.add "trigger", "Oh leave me alone", false
+    triggers.add "blipper", "Should never see", false
+
+    found = triggers.all()
+
+    expect("trigger").toBeIn found
+    expect("blipper").toBeIn found
+    expect(found.length).toEqual 2
+

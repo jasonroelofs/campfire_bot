@@ -12,6 +12,7 @@
       this.chooseRandomTrigger = __bind(this.chooseRandomTrigger, this);
       this.findIn = __bind(this.findIn, this);
       this.add = __bind(this.add, this);
+      this.all = __bind(this.all, this);
       this.reload = __bind(this.reload, this);
       this.triggers = {};
     }
@@ -23,6 +24,9 @@
           return this.add(entry.trigger, entry.response, false);
         }, this));
       }, this));
+    };
+    Triggers.prototype.all = function() {
+      return _.keys(this.triggers);
     };
     Triggers.prototype.add = function(trigger, response, toDb) {
       if (toDb == null) {

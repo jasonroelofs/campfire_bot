@@ -37,6 +37,10 @@ class Bot
     @chat.onText "!reload", "Reload configuration",
       => @triggers.reload
 
+    @chat.onText "!list", "List all known triggers",
+      =>
+        @chat.paste "I respond to the following:\n  " + @triggers.all().join(", ")
+
     @chat.messageHandler this.handleMessage
 
   ##

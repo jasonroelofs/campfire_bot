@@ -32,6 +32,9 @@
       this.chat.onText("!reload", "Reload configuration", __bind(function() {
         return this.triggers.reload;
       }, this));
+      this.chat.onText("!list", "List all known triggers", __bind(function() {
+        return this.chat.paste("I respond to the following:\n  " + this.triggers.all().join(", "));
+      }, this));
       return this.chat.messageHandler(this.handleMessage);
     };
     Bot.prototype.handleMessage = function(message) {

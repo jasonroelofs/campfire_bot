@@ -16,6 +16,12 @@ class Triggers
         this.add entry.trigger, entry.response, false
 
   ##
+  # Get an array of all triggers known.
+  ##
+  all: =>
+    _.keys(@triggers)
+
+  ##
   # Add a new trigger / response to the system.
   # Sets the new trigger in memory and throws out a request
   # to the database to persist the new trigger
