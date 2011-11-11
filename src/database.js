@@ -25,6 +25,12 @@
       stmt.run(trigger, response);
       return stmt.finalize();
     };
+    Database.prototype.removeTrigger = function(trigger, response) {
+      var stmt;
+      stmt = this.db.prepare("delete from triggers where trigger = ? and response = ?");
+      stmt.run(trigger, response);
+      return stmt.finalize();
+    };
     Database.prototype.shutdown = function() {
       return this.db.close();
     };

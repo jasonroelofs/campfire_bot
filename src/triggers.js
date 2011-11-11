@@ -12,6 +12,7 @@
       this.chooseRandomTrigger = __bind(this.chooseRandomTrigger, this);
       this.findIn = __bind(this.findIn, this);
       this.add = __bind(this.add, this);
+      this.removeResponse = __bind(this.removeResponse, this);
       this.responsesFor = __bind(this.responsesFor, this);
       this.all = __bind(this.all, this);
       this.reload = __bind(this.reload, this);
@@ -34,6 +35,14 @@
         this.triggers[trigger] = [];
       }
       return this.triggers[trigger];
+    };
+    Triggers.prototype.removeResponse = function(trigger, index) {
+      var response, t;
+      t = this.triggers[trigger];
+      if ((t != null) && t.length > index) {
+        response = t.splice(index, 1);
+        return this.database.removeTrigger(trigger, response[0]);
+      }
     };
     Triggers.prototype.add = function(trigger, response, toDb) {
       if (toDb == null) {

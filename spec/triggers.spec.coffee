@@ -11,6 +11,8 @@ describe "Triggers", ->
     database = {}
     database.loadAll = jasmine.createSpy "loadAll Spy"
     database.addTrigger = jasmine.createSpy "addTrigger Spy"
+    database.removeTrigger = jasmine.createSpy "removeTrigger Spy"
+
     triggers = new Triggers(database)
 
   it "can be constructed with a database", ->
@@ -68,3 +70,13 @@ describe "Triggers", ->
     expect(found).toEqual ["Oh leave me alone"]
     expect(found2).toEqual []
 
+  it "allows removing a response from a trigger by index", ->
+    triggers.add "trigger", "OMG HAI!", false
+    triggers.add "trigger", "This again?", false
+    triggers.add "trigger", "Oh leave me alone", false
+
+    triggers.removeResponse "trigger", 1
+
+    expect(triggers.responsesFor("trigger")).toEqual ["OMG HAI!", "Oh leave me alone"]
+
+    expect(database.removeTrigger).toHaveBeenCalledWith "trigger", "This again?"

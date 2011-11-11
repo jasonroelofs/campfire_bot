@@ -32,6 +32,16 @@ class Triggers
     @triggers[trigger]
 
   ##
+  # Given a trigger and an index, remove the response
+  # from the trigger, including from the database
+  ##
+  removeResponse: (trigger, index) =>
+    t = @triggers[trigger]
+    if t? and t.length > index
+      response = t.splice index, 1
+      @database.removeTrigger trigger, response[0]
+
+  ##
   # Add a new trigger / response to the system.
   # Sets the new trigger in memory and throws out a request
   # to the database to persist the new trigger

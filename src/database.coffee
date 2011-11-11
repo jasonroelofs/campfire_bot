@@ -19,7 +19,12 @@ class Database
 
   addTrigger: (trigger, response) ->
     stmt = @db.prepare "insert into triggers (trigger, response) values (?, ?)"
-    stmt.run(trigger, response)
+    stmt.run trigger, response
+    stmt.finalize()
+
+  removeTrigger: (trigger, response) ->
+    stmt = @db.prepare "delete from triggers where trigger = ? and response = ?"
+    stmt.run trigger, response
     stmt.finalize()
 
   shutdown: ->
