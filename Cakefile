@@ -6,8 +6,10 @@ task "test", "Run the test suite", (options) ->
 
   isVerbose = true
   showColors = true
+  teamcity = undefined
+  junitreport = { report: false }
 
   jasmine.executeSpecsInFolder specFolder, (runner, log) ->
     sys.print '\n'
     process.exit runner.results().failedCount
-  , isVerbose, showColors, new RegExp(".spec\\.(js|coffee)$", 'i')
+  , isVerbose, showColors, teamcity, new RegExp(".spec\\.(js|coffee)$", 'i'), junitreport
