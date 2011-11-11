@@ -22,6 +22,16 @@ class Triggers
     _.keys(@triggers)
 
   ##
+  # Get the list of responses for the given trigger.
+  # Returns empty list if no known responses
+  ##
+  responsesFor: (trigger) =>
+    if not @triggers[trigger]?
+      @triggers[trigger] = []
+
+    @triggers[trigger]
+
+  ##
   # Add a new trigger / response to the system.
   # Sets the new trigger in memory and throws out a request
   # to the database to persist the new trigger

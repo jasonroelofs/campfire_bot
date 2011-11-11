@@ -58,3 +58,13 @@ describe "Triggers", ->
     expect("blipper").toBeIn found
     expect(found.length).toEqual 2
 
+  it "can return the list of responses for a requested trigger", ->
+    triggers.add "trigger", "Oh leave me alone", false
+    triggers.add "blipper", "Should never see", false
+
+    found = triggers.responsesFor "trigger"
+    found2 = triggers.responsesFor "unknown"
+
+    expect(found).toEqual ["Oh leave me alone"]
+    expect(found2).toEqual []
+
