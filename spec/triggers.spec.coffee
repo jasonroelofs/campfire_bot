@@ -37,6 +37,12 @@ describe "Triggers", ->
     expect(triggers.findIn("I'm looking for a TrIGGeR in here")).toEqual "OMG HAI!"
     expect(triggers.findIn("I'm looking for a trogger in here")).not.toEqual "OMG HAI!"
 
+  it "takes word boundaries into account when searching", ->
+    triggers.add "trigger", "OMG HAI!", false
+
+    expect(triggers.findIn("I'm triggering my gun")).not.toEqual "OMG HAI!"
+    expect(triggers.findIn("I'm thisthatTrIGGeRsomething in here")).not.toEqual "OMG HAI!"
+
   it "randomly chooses a response from multiple on a given trigger", ->
     triggers.add "trigger", "OMG HAI!", false
     triggers.add "trigger", "This again?", false
