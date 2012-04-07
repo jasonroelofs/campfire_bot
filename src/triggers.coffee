@@ -74,7 +74,9 @@ class Triggers
       this.chooseRandomTrigger found
 
   chooseRandomTrigger: (key) =>
-    console.log "Looking for triggers in ", @triggers if Config.debug?
+    if Config.debug
+      console.log "Looking for triggers in ", @triggers
+
     @triggers[key][Math.floor(Math.random() * @triggers[key].length)]
 
 module.exports = Triggers

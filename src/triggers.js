@@ -70,8 +70,8 @@
         return re.test(body);
       });
       if (found) {
-        if (Config.debug != null) console.log("Found trigger ", found);
-        return this.chooseRandomTrigger(found);
+        if (Config.debug) console.log("Found trigger ", found);
+        return this.findBestFitFor(found);
       }
     };
 
@@ -79,6 +79,10 @@
       if (Config.debug != null) {
         console.log("Looking for triggers in ", this.triggers);
       }
+    };
+
+    Triggers.prototype.chooseRandomTrigger = function(key) {
+      if (Config.debug) console.log("Looking for triggers in ", this.triggers);
       return this.triggers[key][Math.floor(Math.random() * this.triggers[key].length)];
     };
 
