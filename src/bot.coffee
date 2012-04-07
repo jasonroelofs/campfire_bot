@@ -28,6 +28,17 @@ class Bot
       (trigger, response) =>
         @triggers.add trigger, response
 
+    @chat.onText "!alias (.*) -> (.*)", "Create an alias to a known trigger",
+      (alias, trigger) =>
+        alias = alias.trim()
+        trigger = trigger.trim()
+
+        if alias == trigger
+          @chat.speak "I won't let you alias a trigger to itself!"
+
+        else if !@triggers.addAlias(alias, trigger)
+          @chat.speak "Unknown trigger #{trigger}"
+
     @chat.onText "!help", "Print this help",
       => @chat.printHelp()
 

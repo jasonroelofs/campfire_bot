@@ -16,7 +16,9 @@
     function Triggers(database) {
       this.database = database;
       this.chooseRandomTrigger = __bind(this.chooseRandomTrigger, this);
+      this.findBestFitFor = __bind(this.findBestFitFor, this);
       this.findIn = __bind(this.findIn, this);
+      this.addAlias = __bind(this.addAlias, this);
       this.add = __bind(this.add, this);
       this.removeResponse = __bind(this.removeResponse, this);
       this.responsesFor = __bind(this.responsesFor, this);
@@ -61,6 +63,12 @@
       if (toDb) return this.database.addTrigger(trigger, response);
     };
 
+    Triggers.prototype.addAlias = function(alias, trigger) {
+      if (this.triggers[trigger] == null) return false;
+      this.add(alias, "-> " + trigger);
+      return true;
+    };
+
     Triggers.prototype.findIn = function(body) {
       var found,
         _this = this;
@@ -75,9 +83,13 @@
       }
     };
 
-    Triggers.prototype.chooseRandomTrigger = function(key) {
-      if (Config.debug != null) {
-        console.log("Looking for triggers in ", this.triggers);
+    Triggers.prototype.findBestFitFor = function(key) {
+      var alias, trigger;
+      trigger = this.chooseRandomTrigger(key);
+      if (alias = trigger.match(/-> (.*)/)) {
+        return this.findBestFitFor(alias[1]);
+      } else {
+        return trigger;
       }
     };
 

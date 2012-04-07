@@ -54,6 +54,14 @@ class Triggers
     @database.addTrigger trigger, response if toDb
 
   ##
+  # Alias the given string to an existing trigger
+  ##
+  addAlias: (alias, trigger) =>
+    return false unless @triggers[trigger]?
+    @add(alias, "-> #{trigger}")
+    true
+
+  ##
   # Given a string from Campfire, look for any trigger
   # text in that string. Returns the response of the first one it finds,
   # or undefined/null if nothing is found
@@ -70,8 +78,16 @@ class Triggers
         re.test(body)
 
     if found
-      console.log "Found trigger ", found if Config.debug?
-      this.chooseRandomTrigger found
+      console.log "Found trigger ", found if Config.debug
+      @findBestFitFor found
+
+  findBestFitFor: (key) =>
+    trigger = @chooseRandomTrigger key
+
+    if alias = trigger.match(/-> (.*)/)
+      @findBestFitFor alias[1]
+    else
+      trigger
 
   chooseRandomTrigger: (key) =>
     if Config.debug

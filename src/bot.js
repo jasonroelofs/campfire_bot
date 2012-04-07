@@ -36,6 +36,15 @@
       this.chat.onPaste(/!record (.*)\n(.*)/i, "Add a new trigger and response", function(trigger, response) {
         return _this.triggers.add(trigger, response);
       });
+      this.chat.onText("!alias (.*) -> (.*)", "Create an alias to a known trigger", function(alias, trigger) {
+        alias = alias.trim();
+        trigger = trigger.trim();
+        if (alias === trigger) {
+          return _this.chat.speak("I won't let you alias a trigger to itself!");
+        } else if (!_this.triggers.addAlias(alias, trigger)) {
+          return _this.chat.speak("Unknown trigger " + trigger);
+        }
+      });
       this.chat.onText("!help", "Print this help", function() {
         return _this.chat.printHelp();
       });

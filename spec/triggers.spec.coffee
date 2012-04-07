@@ -96,3 +96,19 @@ describe "Triggers", ->
     expect(triggers.responsesFor("trigger")).toEqual ["OMG HAI!", "Oh leave me alone"]
 
     expect(database.removeTrigger).toHaveBeenCalledWith "trigger", "This again?"
+
+  describe "addAlias", ->
+    it "can create an alias to a known trigger", ->
+      triggers.add "trigger", "Do it", false
+      result = triggers.addAlias "shooter", "trigger"
+
+      expect(database.addTrigger).toHaveBeenCalledWith "shooter", "-> trigger"
+
+      expect(result).toEqual true
+      expect(triggers.findIn("shooter")).toEqual "Do it"
+
+    it "returns false if the trigger is not known", ->
+      result = triggers.addAlias("shooter", "johnson")
+      expect(result).toEqual false
+
+      expect(database.addTrigger).not.toHaveBeenCalled()
