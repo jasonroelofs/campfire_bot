@@ -49,7 +49,7 @@
         if (trigger) {
           return _this.listResponsesFor(trigger.trim());
         } else {
-          return _this.chat.paste("I respond to the following:\n  " + _this.triggers.all().join(", "));
+          return _this.chat.paste("I respond to the following:\n  " + _this.triggers.all().sort().join(", "));
         }
       });
       this.chat.onText("!remove (.*)", "!remove [trigger] [responseIndex]. Removes the pair. If no index is given lists out all responses for the given trigger.", function(input) {

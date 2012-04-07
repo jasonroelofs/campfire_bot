@@ -43,7 +43,7 @@ class Bot
         if trigger
           @listResponsesFor trigger.trim()
         else
-          @chat.paste "I respond to the following:\n  " + @triggers.all().join ", "
+          @chat.paste "I respond to the following:\n  " + @triggers.all().sort().join ", "
 
     @chat.onText "!remove (.*)", "!remove [trigger] [responseIndex]. Removes the pair. If no index is given lists out all responses for the given trigger.",
       (input) =>
