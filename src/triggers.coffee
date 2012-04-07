@@ -61,7 +61,13 @@ class Triggers
   findIn: (body) =>
     found =
       _.detect _.keys(@triggers), (trigger) =>
-        (new RegExp("\\b" + trigger + "\\b", "i")).test(body)
+        re =
+          if matches = trigger.match /^\/(.*)\/$/
+            new RegExp(matches[1], "i")
+          else
+            new RegExp("\\b" + trigger + "\\b", "i")
+
+        re.test(body)
 
     if found
       console.log "Found trigger ", found if Config.debug?

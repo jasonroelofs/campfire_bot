@@ -43,6 +43,16 @@ describe "Triggers", ->
     expect(triggers.findIn("I'm triggering my gun")).not.toEqual "OMG HAI!"
     expect(triggers.findIn("I'm thisthatTrIGGeRsomething in here")).not.toEqual "OMG HAI!"
 
+  it "works with actual regex strings", ->
+    triggers.add "/^start/", "Regex Found", false
+    triggers.add "/\\^5/", "high five!", false
+
+    expect(triggers.findIn("Doing something start")).not.toEqual "Regex Found"
+    expect(triggers.findIn("start the awesome")).toEqual "Regex Found"
+
+    expect(triggers.findIn("Eating 5 donuts")).not.toEqual "high five!"
+    expect(triggers.findIn("^5 you rock")).toEqual "high five!"
+
   it "randomly chooses a response from multiple on a given trigger", ->
     triggers.add "trigger", "OMG HAI!", false
     triggers.add "trigger", "This again?", false

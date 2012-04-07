@@ -65,7 +65,9 @@
       var found,
         _this = this;
       found = _.detect(_.keys(this.triggers), function(trigger) {
-        return (new RegExp("\\b" + trigger + "\\b", "i")).test(body);
+        var matches, re;
+        re = (matches = trigger.match(/^\/(.*)\/$/)) ? new RegExp(matches[1], "i") : new RegExp("\\b" + trigger + "\\b", "i");
+        return re.test(body);
       });
       if (found) {
         if (Config.debug != null) console.log("Found trigger ", found);
