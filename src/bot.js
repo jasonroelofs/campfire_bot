@@ -19,6 +19,7 @@
   Bot = (function() {
 
     function Bot() {
+      this.listResponsesFor = __bind(this.listResponsesFor, this);
       this.handleEval = __bind(this.handleEval, this);
       this.handleMessage = __bind(this.handleMessage, this);      this.database = new Database();
       this.chat = new Chat();
@@ -44,20 +45,20 @@
       this.chat.onText("!reload", "Reload configuration", function() {
         return _this.triggers.reload;
       });
-      this.chat.onText("!list", "List all known triggers", function() {
-        return _this.chat.paste("I respond to the following:\n  " + _this.triggers.all().join(", "));
+      this.chat.onText("!list(.*)", "List all known triggers, or known responses to the given trigger", function(trigger) {
+        if (trigger) {
+          return _this.listResponsesFor(trigger.trim());
+        } else {
+          return _this.chat.paste("I respond to the following:\n  " + _this.triggers.all().join(", "));
+        }
       });
       this.chat.onText("!remove (.*)", "!remove [trigger] [responseIndex]. Removes the pair. If no index is given lists out all responses for the given trigger.", function(input) {
-        var msg, parsed, responseIndex, trigger;
+        var parsed, responseIndex, trigger;
         parsed = input.split(" ");
         trigger = parsed[0];
         responseIndex = parsed[1];
         if (!(responseIndex != null)) {
-          msg = "I know the following responses for \"" + trigger + "\"\n";
-          _.each(_this.triggers.responsesFor(trigger), function(response, index) {
-            return msg += " [" + index + "] " + response + "\n";
-          });
-          return _this.chat.paste(msg);
+          return _this.listResponsesFor(trigger.trim());
         } else {
           _this.triggers.removeResponse(trigger, parseInt(responseIndex));
           return _this.chat.speak("Response removed");
@@ -77,6 +78,15 @@
 
     Bot.prototype.handleEval = function(output) {
       return this.chat.speak("eval: " + output.result);
+    };
+
+    Bot.prototype.listResponsesFor = function(trigger) {
+      var msg;
+      msg = "I know the following responses for \"" + trigger + "\"\n";
+      _.each(this.triggers.responsesFor(trigger), function(response, index) {
+        return msg += " [" + index + "] " + response + "\n";
+      });
+      return this.chat.paste(msg);
     };
 
     Bot.prototype.run = function() {

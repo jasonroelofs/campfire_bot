@@ -33,14 +33,17 @@ class Bot
 
     @chat.onText /!eval (.*)/i, "Evaluate a Javascript expression",
       (expr) =>
-        @sandbox.run expr, this.handleEval
+        @sandbox.run expr, @handleEval
 
     @chat.onText "!reload", "Reload configuration",
       => @triggers.reload
 
-    @chat.onText "!list", "List all known triggers",
-      =>
-        @chat.paste "I respond to the following:\n  " + @triggers.all().join ", "
+    @chat.onText "!list(.*)", "List all known triggers, or known responses to the given trigger",
+      (trigger) =>
+        if trigger
+          @listResponsesFor trigger.trim()
+        else
+          @chat.paste "I respond to the following:\n  " + @triggers.all().join ", "
 
     @chat.onText "!remove (.*)", "!remove [trigger] [responseIndex]. Removes the pair. If no index is given lists out all responses for the given trigger.",
       (input) =>
@@ -49,11 +52,7 @@ class Bot
         responseIndex = parsed[1]
 
         if not responseIndex?
-          msg = "I know the following responses for \"#{trigger}\"\n"
-          _.each @triggers.responsesFor(trigger), (response, index) ->
-            msg += " [#{index}] #{response}\n"
-
-          @chat.paste msg
+          @listResponsesFor trigger.trim()
         else
           @triggers.removeResponse trigger, parseInt(responseIndex)
           @chat.speak "Response removed"
@@ -72,6 +71,13 @@ class Bot
 
   handleEval: (output) =>
     @chat.speak "eval: " + output.result
+
+  listResponsesFor: (trigger) =>
+    msg = "I know the following responses for \"#{trigger}\"\n"
+    _.each @triggers.responsesFor(trigger), (response, index) ->
+      msg += " [#{index}] #{response}\n"
+
+    @chat.paste msg
 
   run: ->
     @chat.run()
