@@ -112,3 +112,9 @@ describe "Triggers", ->
       expect(result).toEqual false
 
       expect(database.addTrigger).not.toHaveBeenCalled()
+
+    it "eventually stops if aliases produce a loop", ->
+      triggers.add "trigger", "-> shooter", false
+      triggers.add "shooter", "-> trigger", false
+
+      expect(triggers.findIn("shooter")).toEqual "Infinite loop detected ... jerks"

@@ -81,11 +81,14 @@ class Triggers
       console.log "Found trigger ", found if Config.debug
       @findBestFitFor found
 
-  findBestFitFor: (key) =>
+  findBestFitFor: (key, count = 0) =>
+    if count >= 10
+      return "Infinite loop detected ... jerks"
+
     trigger = @chooseRandomTrigger key
 
     if alias = trigger.match(/-> (.*)/)
-      @findBestFitFor alias[1]
+      @findBestFitFor alias[1], count + 1
     else
       trigger
 

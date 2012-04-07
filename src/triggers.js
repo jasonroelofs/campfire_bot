@@ -83,11 +83,13 @@
       }
     };
 
-    Triggers.prototype.findBestFitFor = function(key) {
+    Triggers.prototype.findBestFitFor = function(key, count) {
       var alias, trigger;
+      if (count == null) count = 0;
+      if (count >= 10) return "Infinite loop detected ... jerks";
       trigger = this.chooseRandomTrigger(key);
       if (alias = trigger.match(/-> (.*)/)) {
-        return this.findBestFitFor(alias[1]);
+        return this.findBestFitFor(alias[1], count + 1);
       } else {
         return trigger;
       }
